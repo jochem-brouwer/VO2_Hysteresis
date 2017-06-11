@@ -1,0 +1,23 @@
+Create an "experiment" class where all data is dumped into specific folders so it's much easier to extract those later.
+Also allow helper functions to load/save lattices for later use.
+
+
+VO2
+MIT / SPT
+Mott/Peierls
+Puddles
+Ising
+Phase transitions
+Monte carlo
+Metropolis
+Demon
+
+Energy Barriers: why it wont work in this Ising model
+Nucleation theory
+Martensitic transition
+
+Percolation
+Random bond
+Random field
+
+Resistancae calculations
