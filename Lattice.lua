@@ -318,7 +318,7 @@ function Lattice:FlipSpin(Grain)
 		self.RN:Update(Grain)
 	end
 end 
-
+--[[ 
 function Lattice:GetU()
 	local sum = 0;
 	error('disabled')
@@ -332,7 +332,7 @@ function Lattice:GetU()
 	end
 	return sum;
 end
-
+--]]
 function Lattice:GetM()
 
 	local sum = 0;
