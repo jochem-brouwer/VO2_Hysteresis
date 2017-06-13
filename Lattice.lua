@@ -1,6 +1,6 @@
 local Lattice = {}
 
-local ResistanceNetwork = require 'Resistance'
+--local ResistanceNetwork = require 'Resistance'
 
 local gd 
 
@@ -10,7 +10,7 @@ Lattice.Temperature = 0;
 
 function Lattice:New()
 	local NewLattice = {};
-	local RN = ResistanceNetwork:new();
+	--local RN = ResistanceNetwork:new();
 	NewLattice.RN = RN;
 	return setmetatable(NewLattice, {__index=self,__gc=self.Destroy})
 end
@@ -267,6 +267,24 @@ function Lattice:GetDeltaU(Grain)
 	local UOld = b_energ + FieldEnergy;
 	local dU = -UOld*2;
 	return dU
+end 
+
+-- Gets the total lattice energy.
+function Lattice:U()
+	local E = 0;
+	for i,Grain in pairs(self.Grains) do
+		-- Magnetic field term;
+		local spin = Grain.Spin;
+		E = E + (- ((Grain.LocalField or 0) + self.ExternalField)*spin);
+
+		-- Calculate interaction energy;
+		local E_int = 0;
+		for i, Neighbour in pairs(Grain.Neighbour) do 
+			-- Pick either the global J or the bond J
+			local J = (Grain.Bonds and Grain.Bonds[i]) or self.J; 
+			E_int = E_int - spin*Neighbour.Spin * J;
+		end 
+	end 
 end 
 
 -- Dump the lattice in the filename.
