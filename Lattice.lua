@@ -275,7 +275,7 @@ function Lattice:U()
 
 		-- Calculate interaction energy;
 		local E_int = 0;
-		for i, Neighbour in pairs(Grain.Neighbour) do 
+		for i, Neighbour in pairs(Grain.Neighbours) do 
 			-- Pick either the global J or the bond J
 			local J = (Grain.Bonds and Grain.Bonds[i]) or self.J; 
 			E_int = E_int - spin*Neighbour.Spin * J;
