@@ -13,7 +13,7 @@ local valid = {
 }
 
 function Plotter:Set(index, value)
-	gp[index]=value;
+	self.gp[index]=value;
 end 
 
 function Plotter:SetData(dname, data, new_dbin)
