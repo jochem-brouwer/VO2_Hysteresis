@@ -1,5 +1,7 @@
 local Lattice = {}
 
+local ResistanceNetwork = require 'Resistance'
+
 local gd 
 
 Lattice.ExternalField=0; -- This is the external field strength.
@@ -7,7 +9,10 @@ Lattice.J = 1;
 Lattice.Temperature = 0;
 
 function Lattice:New()
-	return setmetatable({}, {__index=self,__gc=self.Destroy})
+	local NewLattice = {};
+	local RN = ResistanceNetwork:new();
+	NewLattice.RN = RN;
+	return setmetatable(NewLattice, {__index=self,__gc=self.Destroy})
 end
 
 -- Call this function to finalize the lattice. Do this at end of a simulation, or when unloading the lattice.
@@ -194,8 +199,9 @@ function Lattice:InitRandomBond(variance, mean)
 	end 
 end
 
-function Lattice:SetSpin(x,y,z,sptype)
-	self.Grid[x][y][z] = sptype;
+function Lattice:InitRN() 
+	self.ResUpdate = true; 
+	self.RN:Setup(self);
 end 
 
 -- if NOT_PERIODIC is true, then free boundary conditions are used. 
@@ -240,10 +246,6 @@ function Lattice:GetNeighbours(x,y,z, NOT_PERIODIC)
 	end  
 	return list
 end 
-
-function Lattice:GetU()
-
-end
 
 function Lattice:GetDeltaU(Grain)
 	local Neighbours = Grain.Neighbours;
@@ -292,6 +294,13 @@ function Lattice:Dump(fname)
 	fhandle:write(table.concat(out_t, ", ").."\n")
 	--fhandle:flush();
 	--fhandle:close()
+end 
+
+function Lattice:FlipSpin(Grain)
+	Grain.Spin = -Grain.Spin;
+	if self.ResUpdate then 
+		self.RN:Update(Grain)
+	end
 end 
 
 function Lattice:GetU()

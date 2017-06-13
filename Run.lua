@@ -7,8 +7,12 @@ local Model = require 'Model';
 Model = Model:New();
 Model.Lattice = MyLattice;
 
-MyLattice:Init(100,100,10);
-MyLattice:InitRandomField(32,0);
+MyLattice:Init(100,100,1);
+MyLattice:InitRandomField(8,0);
+
+-- If you want to calculate resistances, also init the RN;
+
+MyLattice:InitRN();
 
 function Model:Measure(Lattice)
 	-- Return a table where [ylabel] = measuredpoint.
@@ -47,10 +51,18 @@ local function tjoin(t1, t2)
 end 
 
 
-local Field = linspace(-8,500,8);
-local Field2 = linspace(8,500,-8);
+local Field = linspace(-3,550,2.5);
+local Field2 = linspace(2.5,400,-1.5);
+local Field3 = linspace(-1.5,450,3);
+local Field4 = linspace(3,550,-2.5);
+local Field5 = linspace(-2.5,400,1.5);
+local Field6 = linspace(1.5,450,-3);
 
 local Field = tjoin(Field,Field2);
+local Field = tjoin(Field,Field3);
+local Field = tjoin(Field,Field4);
+local Field = tjoin(Field,Field5);
+local Field = tjoin(Field,Field6);
 
 
 local Params = {
