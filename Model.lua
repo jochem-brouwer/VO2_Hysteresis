@@ -4,6 +4,8 @@ local Plotter = require 'Plotter'
 
 Model.Lattice = nil;
 
+Model.k = 1; -- boltzmann
+
 function Model:New()
 	local obj = {};
 	setmetatable(obj, {__index=self})
@@ -32,7 +34,7 @@ local function maxt(t)
 end 
 
 -- 
-function Model:Run(PList, SweepMode)
+function Model:Run(PList, SweepMode, SweepOptions)
 	local index = next(PList)
 	local DataOut = {};
 
@@ -58,7 +60,7 @@ function Model:Run(PList, SweepMode)
 			end
 --			self.Lattice:Show() 
 			print(self.Lattice:GetM(), PList.ExternalField[i])
---			self.Lattice:Dump("tmp.lat")
+			self.Lattice:Dump("tmp.lat")
 		
 			local Measure = self:Measure(self.Lattice);
 
@@ -78,15 +80,15 @@ function Model:Run(PList, SweepMode)
 			end 
 
 		end 
---		self.Lattice:ToAnim("tmp.lat", "out.gif",4,5,1)
+		self.Lattice:ToAnim("tmp.lat", "out.gif",4,5,1)
 
 		-- Plot this data.
 
 		for xLabel, Contents in pairs(DataOut) do 
 			for yLabel, Data in pairs(Contents) do 
 				local NewPlot = Plotter:New();
-				NewPlot:Set("xlabel", xLabel) -- Create a new plot. 
-				NewPlot:Set("ylabel", yLabel);
+				NewPlot:Set("xlabel", "Normalized temperature") -- Create a new plot. 
+				NewPlot:Set("ylabel", "Volume fraction metal");
 				local Data = Data;
 				if yLabel == "M" and xLabel == "ExternalField" then 
 					local new = {};
@@ -114,8 +116,61 @@ function Model:Run(PList, SweepMode)
 			end 
 		end 
 
-	elseif SweepMode == "Metropolis" then  
+	elseif SweepMode == "Metropolis" then 
+		local SweepOptions = SweepOptions or {};
+		-- One full sweep per setting is default.
+		local Sweeps = SweepOptions.Sweeps or self.Lattice.x*self.Lattice.y*self.Lattice.z;
+		local k = self.k;
+		for i = 1, #PList[index] do 
+			-- Set vars.
+			for ParamName, Params in pairs(PList) do 
+				self.Lattice[ParamName] = Params[i];
+			end 
+			local rep = true;
+			while rep do 
+				rep=false;
+			-- Sweep over grain.
+				for _, Grain in pairs(self.Lattice.Grains) do 
+					--print(self.Lattice:GetDeltaU(Grain))
+					if self.Lattice:GetDeltaU(Grain) < 0 then 
+						self.Lattice:FlipSpin(Grain);
+						rep=true;
+					end 
+				end
+			end
 
+			for Sweep = 1,Sweeps do 
+				-- Pick a random grain; 
+				local Grain = self.Lattice:GetRandomLatticeSite();
+				local dU = self.Lattice:GetDeltaU(Grain);
+				if dU < 0 then 
+					self.Lattice:FlipSpin(Grain) 
+				elseif math.exp(dU/(self.k*self.Lattice.Temperature)) > math.random() then 
+					self.Lattice:FlipSpin(Grain)
+				end 
+			end 
+--			self.Lattice:Show() 
+			print(self.Lattice:GetM(), PList.ExternalField[i])
+--			self.Lattice:Dump("tmp.lat")
+		
+			local Measure = self:Measure(self.Lattice);
+
+			for ParamName, Data in pairs(PList) do 
+				if not DataOut[ParamName]then 
+					DataOut[ParamName] = {};
+				end 
+				local xValue = Data[i]; 
+
+				for index, yValue in pairs(Measure) do 
+					if not (DataOut[ParamName][index]) then 
+						DataOut[ParamName][index] = {x = {}, y = {}};
+					end 
+					table.insert(DataOut[ParamName][index].x, xValue);
+					table.insert(DataOut[ParamName][index].y, yValue);
+				end 
+			end 
+
+		end
 	end
 
 
