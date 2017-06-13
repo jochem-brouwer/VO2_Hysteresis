@@ -97,12 +97,7 @@ end
 
 
 function Lattice:GetRandomLatticeSite()
-	local xmax = self.x;
-	local ymax = self.y;
-	local zmax = self.z;
-
-	local x,y,z = math.floor(math.random()*xmax)+1,math.floor(math.random()*ymax)+1,math.floor(math.random()*zmax)+1;
-	return x,y,z 
+	return self.Grains[math.random(1,self.NumGrains)]
 end 
 
 -- Well this actually works as a clear too... Ok then.
@@ -159,6 +154,7 @@ function Lattice:InitGrains()
 			end 
 		end 
 	end
+	self.NumGrains = #Grains;
 	self.Grains=Grains;
 end 
 
@@ -284,7 +280,9 @@ function Lattice:U()
 			local J = (Grain.Bonds and Grain.Bonds[i]) or self.J; 
 			E_int = E_int - spin*Neighbour.Spin * J;
 		end 
+		E = E+E_int;
 	end 
+	return E
 end 
 
 -- Dump the lattice in the filename.
