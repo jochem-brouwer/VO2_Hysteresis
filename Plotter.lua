@@ -1,5 +1,8 @@
 local gp = require 'lgnuplot'
 
+-- Plotter; for a new output file
+-- You can add more data files to a Plotter instance by passing true as new_dbin to Plotter:SetData
+
 local Plotter = {};
 
 function Plotter:New()
