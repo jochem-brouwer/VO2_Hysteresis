@@ -52,12 +52,12 @@ end
 function Resistance:Update(Grain)
 	-- Grain is flipped. Update neighbours.
 	local Lattice=self.Lattice;
-	local iSelf = Lattice.IndexFromGrain[Grain];
+	local iSelf = Grain.Index;
 
 	local A = self.A;
 
 	for i,Grain2 in pairs(Grain.ResistanceNeighbours) do 
-		local iGrain = Lattice.IndexFromGrain[Grain2];
+		local iGrain = Grain2.Index;
 		local C = self:GetC(Grain.Spin,Grain2.Spin)
 
 --		C[iSelf][iGrain] = C;
@@ -77,12 +77,13 @@ end
 
 function Resistance:Setup(Lattice)
 	self.Lattice = Lattice;
-	if not Lattice.IndexFromGrain then 
+	--[[if not Lattice.IndexFromGrain then 
 		Lattice.IndexFromGrain = {};
 		for i,v in pairs(Lattice.Grains) do 
 			Lattice.IndexFromGrain[v] = i;
 		end
-	end 
+	end --]]
+	local num_resistors = 0;
 	local max_i = 0;
 	for x=1,Lattice.x do 
 		for y=1,Lattice.y do
@@ -93,7 +94,7 @@ function Resistance:Setup(Lattice)
 				Grain1.ResistanceNeighbours = {};
 
 				local i1 = Grain1.Index
-				print(i1)
+
 				for _, Neighbour in pairs(Neighbours) do 
 					local Grain2 = Lattice.Grid[Neighbour[1]][Neighbour[2]][Neighbour[3]]	
 					table.insert(Grain1.ResistanceNeighbours, Grain2);		
@@ -106,6 +107,7 @@ function Resistance:Setup(Lattice)
 					self.C[i2][i1] = C;
 					max_i = math.max(max_i, i1,i2)
 				end
+				num_resistors = num_resistors + #Grain1.ResistanceNeighbours;
 			end 
 		end 
 	end 
@@ -129,11 +131,12 @@ function Resistance:Setup(Lattice)
 					sum = sum + (C[i][k] or 0)
 				end 
 				A[i][j] = sum;
-				print(i,j,sum)
+		
 			end 
 		end 
 	end 
 
+	num_resistors = num_resistors/2;
 
 end 
 
