@@ -1,10 +1,32 @@
-local Matrix = require'Matrix';
+local m = require'Matrix';
 
+--[[
+local SIZE = 100;
+local TEST = {};
+local RES = 3;
+for i = 1, SIZE do 
+	TEST[i] = {};
+	for y = 1,SIZE do 
+		if y==i then
+			TEST[i][y] = (SIZE-1)*RES;
+		else 
+			TEST[i][y] = -RES;
+		end 
+	end
+end 
+--]]
 
-local Test = {	{1,2,3,9};
-				{4,5,6,3};
-				{7,8,8,1};
-				{-9,-7,-100,-1};
-			};
+local Matrix = {};
 
-Matrix:Det(Test)
+Matrix[1] = {3,-1,0,-1,-1,0,0,0};
+Matrix[2] = {-1,3,-1,0,0,-1,0,0};
+Matrix[3] = {0,-1,3,-1,0,0,-1,0};
+Matrix[4] = {-1,0,-1,3,0,0,0,-1};
+Matrix[5] = {-1,0,0,0,3,-1,0,-1};
+Matrix[6] = {0,-1,0,0,-1,3,-1,0};
+Matrix[7] = {0,0,-1,0,0,-1,3,-1};
+Matrix[8] = {0,0,0,-1,-1,0,-1,3};
+Rkl = m:Eig(Matrix,{[1] = true, [7] = true});
+Rl = m:Eig(Matrix, {[1] = true});
+print(Rkl,Rl)
+print(Rkl/Rl)
