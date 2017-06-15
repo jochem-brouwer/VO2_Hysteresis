@@ -4,7 +4,7 @@ VO_2 Model: Modelling the structural phase transition of Vanadium Dioxide
 
 Requirements:
 
-The model can run by only using Lua, which can be downloaded from lua.org
+The model can run by only using Lua, which can be downloaded from lua.org (lua version 5.1.5 is supported, later versions are not supported)
 
 However, the extended features of the model, such as graphics, plotting, require external libraries:
 
