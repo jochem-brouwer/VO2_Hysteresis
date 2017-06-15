@@ -30,7 +30,7 @@ end
 
 
 
-function Matrix:Eig(A, skip_cr)
+function Matrix:Det(A, skip_cr)
 	local skip_cr = skip_cr or {};
 	local NewMatrix = {};
 	local TransposedMatrix = {};
