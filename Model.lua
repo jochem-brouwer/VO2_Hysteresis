@@ -59,7 +59,7 @@ function Model:Run(PList, SweepMode, SweepOptions)
 				end
 			end
 --			self.Lattice:Show() 
-			print(self.Lattice:GetM(), PList.ExternalField[i])
+--			print(self.Lattice:GetM(), PList.ExternalField[i])
 			self.Lattice:Dump("tmp.lat")
 		
 			local Measure = self:Measure(self.Lattice);
@@ -143,14 +143,16 @@ function Model:Run(PList, SweepMode, SweepOptions)
 				-- Pick a random grain; 
 				local Grain = self.Lattice:GetRandomLatticeSite();
 				local dU = self.Lattice:GetDeltaU(Grain);
-				if dU < 0 then 
+		--		print(dU, dU/(self.k*self.Lattice.Temperature), math.exp(-dU/(self.k*self.Lattice.Temperature)))
+				if dU <= 0 then 
 					self.Lattice:FlipSpin(Grain) 
-				elseif math.exp(dU/(self.k*self.Lattice.Temperature)) > math.random() then 
+				elseif math.exp(-dU/(self.k*self.Lattice.Temperature)) > math.random() then 
 					self.Lattice:FlipSpin(Grain)
 				end 
 			end 
---			self.Lattice:Show() 
-			print(self.Lattice:GetM(), PList.ExternalField[i])
+		--	print(self.Lattice.ExternalField)
+		--	self.Lattice:Show() 
+--			print(self.Lattice:GetM(), PList.ExternalField[i])
 --			self.Lattice:Dump("tmp.lat")
 		
 			local Measure = self:Measure(self.Lattice);
@@ -171,6 +173,41 @@ function Model:Run(PList, SweepMode, SweepOptions)
 			end 
 
 		end
+
+		for xLabel, Contents in pairs(DataOut) do 
+			for yLabel, Data in pairs(Contents) do 
+				local NewPlot = Plotter:New();
+				NewPlot:Set("xlabel", xlabel) -- Create a new plot. 
+				NewPlot:Set("ylabel", ylabel);
+				local Data = Data;
+				if yLabel == "M" and xLabel == "ExternalField" then 
+					local new = {};
+					new.x = {};
+					new.y = {};
+					local min_x = mint(Data.x);
+					local max_x = maxt(Data.x);
+					for ind, val in pairs(Data.x) do 
+						table.insert(new.x, (val - min_x)/(max_x - min_x));
+					end 
+					local min_y = mint(Data.y);
+					local max_y = maxt(Data.y);
+					for ind, val in pairs(Data.y) do 
+						table.insert(new.y, (val - min_y)/(max_y - min_y));
+					end 
+
+					NewPlot:SetData("xdata", new.x,true);
+					NewPlot:SetData("ydata", new.y);
+				else 
+					NewPlot:SetData("xdata", Data.x,true);
+					NewPlot:SetData("ydata", Data.y);
+				end 
+			--	NewPlot:SetData("title", yLabel .. " vs " .. xLabel)
+				NewPlot:Plot(yLabel.."vs"..xLabel..".png")
+			end 
+		end 
+
+
+
 	end
 
 

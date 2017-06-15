@@ -1,6 +1,6 @@
 local Lattice = {}
 
---local ResistanceNetwork = require 'Resistance'
+local ResistanceNetwork = require 'Resistance'
 
 local gd 
 
@@ -11,7 +11,7 @@ Lattice.Temperature = 0;
 function Lattice:New()
 	local NewLattice = {};
 	--local RN = ResistanceNetwork:new();
-	NewLattice.RN = RN;
+	NewLattice.RN = ResistanceNetwork:New();
 	return setmetatable(NewLattice, {__index=self,__gc=self.Destroy})
 end
 
@@ -150,7 +150,9 @@ function Lattice:InitGrains()
 	for xi = 1, x do 
 		for yi = 1, y do 
 			for zi = 1, z do 
-				table.insert(Grains, self.Grid[xi][yi][zi])
+				local Grain = self.Grid[xi][yi][zi];
+				Grain.Index=#Grains+1;
+				table.insert(Grains, Grain)
 			end 
 		end 
 	end
@@ -199,6 +201,8 @@ function Lattice:InitRN()
 	self.ResUpdate = true; 
 	self.RN:Setup(self);
 end 
+
+
 
 -- if NOT_PERIODIC is true, then free boundary conditions are used. 
 function Lattice:GetNeighbours(x,y,z, NOT_PERIODIC)

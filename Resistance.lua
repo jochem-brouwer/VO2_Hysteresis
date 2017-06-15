@@ -13,6 +13,12 @@ Resistance.Resistances = {
 	[1] = 10^2;
 }
 
+
+Resistance.Resistances = {
+	[-1] = 100;-- Semiconducting;
+	[1] = 1;
+}
+
 -- Both;
 local rr= Resistance.Resistances;
 Resistance.Resistances[0] = 1/(1/rr[1]+1/rr[-1]);
@@ -23,14 +29,12 @@ Resistance.Resistances[0] = 1/(1/rr[1]+1/rr[-1]);
 
 -- Calculate the resistance of a given network of resistors (actually a Lattice object)
 
-local Matrix = {};
+local Matrix = require 'Matrix' 
 
-function Matrix:New();
-	return setmetatable({}, {__index=self})
-end 
+
 
 function Resistance:New()
-	return setmetatable({A={}, C={}, {__index=self}})
+	return setmetatable({A={}, C={}}, {__index=self})
 end  
 
 function Resistance:GetC(s1,s2)
@@ -41,20 +45,25 @@ function Resistance:GetC(s1,s2)
 	end 
 end 
 
+
+-- Todo: Add an update mode wether or not we update C/A matrices
+-- This is to make it easier to add new methods like resistances which scale with temperature
+-- Or to implement something else like 
 function Resistance:Update(Grain)
 	-- Grain is flipped. Update neighbours.
 	local Lattice=self.Lattice;
 	local iSelf = Lattice.IndexFromGrain[Grain];
 
-
+	local A = self.A;
 
 	for i,Grain2 in pairs(Grain.ResistanceNeighbours) do 
 		local iGrain = Lattice.IndexFromGrain[Grain2];
-		local C = GetC(Grain.Spin,Grain2.Spin)
-		C[iSelf][iGrain] = C;
-		C[iGrain][iSelf] = C;
+		local C = self:GetC(Grain.Spin,Grain2.Spin)
 
-		local C_OLD = -A[iSelf][iGrain];
+--		C[iSelf][iGrain] = C;
+--		C[iGrain][iSelf] = C;
+
+		local C_OLD = -(A[iSelf][iGrain]);
 		local Delta = C - C_OLD;
 
 		A[iSelf][iGrain] = -C; 
@@ -74,6 +83,7 @@ function Resistance:Setup(Lattice)
 			Lattice.IndexFromGrain[v] = i;
 		end
 	end 
+	local max_i = 0;
 	for x=1,Lattice.x do 
 		for y=1,Lattice.y do
 			for z=1,Lattice.z do 
@@ -82,17 +92,19 @@ function Resistance:Setup(Lattice)
 				local Grain1 = Lattice.Grid[x][y][z];
 				Grain1.ResistanceNeighbours = {};
 
-				local i1 = Lattice.IndexFromGrain[Grain1]
-
+				local i1 = Grain1.Index
+				print(i1)
 				for _, Neighbour in pairs(Neighbours) do 
 					local Grain2 = Lattice.Grid[Neighbour[1]][Neighbour[2]][Neighbour[3]]	
 					table.insert(Grain1.ResistanceNeighbours, Grain2);		
-					local i2 = Lattice.IndexFromGrain[Grain2];
+					local i2 = Grain2.Index
 
 					local C = self:GetC(Grain1.Spin,Grain2.Spin);
-
+					if not self.C[i1] then self.C[i1] = {} end;
+					if not self.C[i2] then self.C[i2] = {} end;
 					self.C[i1][i2] = C;
 					self.C[i2][i1] = C;
+					max_i = math.max(max_i, i1,i2)
 				end
 			end 
 		end 
@@ -101,19 +113,23 @@ function Resistance:Setup(Lattice)
 	-- Make A
 	local C = self.C;
 	local A = self.A; 
-	for i = 1, #C[1] do 
-		for j, Cij in pairs(C[i]) do 
+	for i = 1, max_i do 
+		for j = 1, max_i do 
+			local Cij = C[i][j];
 			if not A[i] then 
 				A[i] = {};
 			end 
 			if i ~= j then 
-				A[i][j] = -Cij 
+				if Cij then 
+					A[i][j] = -Cij
+				end
 			else 
 				local sum = 0;
-				for k = 1, #A[i] do 
-					sum = sum + A[i][k]
+				for k = 1, max_i do 
+					sum = sum + (C[i][k] or 0)
 				end 
 				A[i][j] = sum;
+				print(i,j,sum)
 			end 
 		end 
 	end 
@@ -121,12 +137,11 @@ function Resistance:Setup(Lattice)
 
 end 
 
-
-function Resistance:GetResistance(Lattice,Grain1,Grain2)
-	local i1 = Lattice.IndexFromGrain[Grain1];
-	local i2 = Lattice.IndexFromGrain[Grain2];
-
-
+-- Per det formula
+function Resistance:GetResistance(Grain1_Index,Grain2_Index)
+	local Out1 = Matrix:Det(self.A, {[Grain1_Index]=true; [Grain2_Index]=true});
+	local Out2 = Matrix:Det(self.A, {[Grain1_Index]=true});
+	return Out1/Out2;
 end 
 
 
