@@ -34,10 +34,11 @@ local function maxt(t)
 end 
 
 -- 
-function Model:Run(PList, SweepMode, SweepOptions)
+function Model:Run(PList, SweepMode, Options)
 	local index = next(PList)
 	local DataOut = {};
 
+	local ANIM = Options and Options.Anim;
 
 	if SweepMode == "Cycle" then 
 		for i = 1, #PList[index] do 
@@ -60,8 +61,9 @@ function Model:Run(PList, SweepMode, SweepOptions)
 			end
 --			self.Lattice:Show() 
 --			print(self.Lattice:GetM(), PList.ExternalField[i])
-			self.Lattice:Dump("tmp.lat")
-		
+			if ANIM then 
+				self.Lattice:Dump("tmp.lat")
+			end 
 			local Measure = self:Measure(self.Lattice);
 
 			for ParamName, Data in pairs(PList) do 
@@ -80,8 +82,9 @@ function Model:Run(PList, SweepMode, SweepOptions)
 			end 
 
 		end 
-		self.Lattice:ToAnim("tmp.lat", "out.gif",4,5,1)
-
+		if ANIM then 
+			self.Lattice:ToAnim("tmp.lat", "out.gif",4,5,1)
+		end
 		-- Plot this data.
 
 		for xLabel, Contents in pairs(DataOut) do 
@@ -117,7 +120,7 @@ function Model:Run(PList, SweepMode, SweepOptions)
 		end 
 
 	elseif SweepMode == "Metropolis" then 
-		local SweepOptions = SweepOptions or {};
+		local SweepOptions = Options or {};
 		-- One full sweep per setting is default.
 		local Sweeps = SweepOptions.Sweeps or self.Lattice.x*self.Lattice.y*self.Lattice.z;
 		local k = self.k;
@@ -149,6 +152,10 @@ function Model:Run(PList, SweepMode, SweepOptions)
 				elseif math.exp(-dU/(self.k*self.Lattice.Temperature)) > math.random() then 
 					self.Lattice:FlipSpin(Grain)
 				end 
+			end 
+
+			if ANIM then 
+				self.Lattice:Dump("tmp.lat")
 			end 
 		--	print(self.Lattice.ExternalField)
 		--	self.Lattice:Show() 
@@ -205,7 +212,10 @@ function Model:Run(PList, SweepMode, SweepOptions)
 				NewPlot:Plot(yLabel.."vs"..xLabel..".png")
 			end 
 		end 
-
+		
+		if ANIM then 
+			self.Lattice:ToAnim("tmp.lat", "out.gif",4,5,1)
+		end
 
 
 	end
