@@ -130,7 +130,7 @@ function Model:Run(PList, SweepMode, Options)
 				self.Lattice[ParamName] = Params[i];
 			end 
 			local rep = true;
-			while rep do 
+	--[[		while rep do 
 				rep=false;
 			-- Sweep over grain.
 				for _, Grain in pairs(self.Lattice.Grains) do 
@@ -140,7 +140,7 @@ function Model:Run(PList, SweepMode, Options)
 						rep=true;
 					end 
 				end
-			end
+			end--]]
 
 			for Sweep = 1,Sweeps do 
 				-- Pick a random grain; 
@@ -157,6 +157,8 @@ function Model:Run(PList, SweepMode, Options)
 			if ANIM then 
 				self.Lattice:Dump("tmp.lat")
 			end 
+
+
 		--	print(self.Lattice.ExternalField)
 		--	self.Lattice:Show() 
 --			print(self.Lattice:GetM(), PList.ExternalField[i])
@@ -180,6 +182,7 @@ function Model:Run(PList, SweepMode, Options)
 			end 
 
 		end
+		
 
 		for xLabel, Contents in pairs(DataOut) do 
 			for yLabel, Data in pairs(Contents) do 
@@ -212,7 +215,7 @@ function Model:Run(PList, SweepMode, Options)
 				NewPlot:Plot(yLabel.."vs"..xLabel..".png")
 			end 
 		end 
-		
+
 		if ANIM then 
 			self.Lattice:ToAnim("tmp.lat", "out.gif",4,5,1)
 		end
