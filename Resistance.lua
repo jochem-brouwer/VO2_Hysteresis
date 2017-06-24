@@ -257,7 +257,7 @@ function Resistance:Setup(Lattice)
 	-- Add the solutions to these equations!
 
 	for row in pairs(self.System) do 
-		self.System[row][colmax+2] = 0;
+		self.System[row][colmax+2] = nil;
 	end 
 
 	self.Colmax = colmax;
@@ -295,8 +295,8 @@ function Resistance:GetResistance(Grain1, Grain2)
 	self.System[eq1][v1] = 1;
 	self.System[eq2][v2] = 1;
 
-	self.System[eq1][self.Colmax+2] = 1;
-	self.System[eq2][self.Colmax+2] = 0;
+	self.System[eq1][self.Colmax+2] = 1; 
+	self.System[eq2][self.Colmax+2] = nil; -- 0
 
 	-- V2 = 0. So we can immediately remove all columns of v2.
 

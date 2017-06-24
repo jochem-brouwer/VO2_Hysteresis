@@ -177,16 +177,32 @@ function Matrix:ToFile(A, fname)
 	local csize = 0;
 	for Row, Data in pairs(A) do 
 		for Column, Number in pairs(Data) do
-			f:write(Column .. " " .. Row .. " " .. Number .. "\n")
+			f:write(Row .. "\t" .. Column .. "\t" .. Number .. "\n")
 			csize = math.max(csize,Column)
 		end 
 	end 
-	f:write( csize.. " " .. rsize .. " " .. (A[rsize][csize] or 0) .. "\n")
+	if not A[rsize][csize] then 
+		f:write( rsize.. "\t" .. csize .. "\t" .. (A[rsize][csize] or 0) .. "\n")
+	end
 	f:close()
 end 
 
 function Matrix:ToUpper_Matlab_LastSol(A)
-	self:ToFile(A, 'matlab.dat')
+	self:ToFile(A, 'matlab_workdir/matlab.dat')
+	this = io.open('matlab_workdir/work.txt','w')
+	this:close()
+	local f 
+	repeat
+		os.execute("sleep 0.01")
+		f = io.open('matlab_workdir/result.txt')
+	until f 
+
+
+	os.remove('matlab_workdir/work.txt');
+	os.remove('matlab_workdir/result.txt');
+
+	result = tonumber(f:read("*all") or 0);
+	return result
 end
 
 -- Only care about last solution.
