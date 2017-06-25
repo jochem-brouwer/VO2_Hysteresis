@@ -15,7 +15,7 @@ Resistance.Resistances = {
 
 
 Resistance.Resistances = {
-	[-1] = 2;-- Semiconducting;
+	[-1] = 100;-- Semiconducting;
 	[1] = 1;
 }
 
@@ -158,8 +158,10 @@ end
 
 function Resistance:GetGrainResistance(s1,s2)
 	if s1 == s2 then 
+
 		return (self.Resistances[s1])
 	else 
+
 		return (self.Resistances[0])
 	end 
 end 
@@ -201,7 +203,7 @@ function Resistance:Setup(Lattice)
 					table.insert(Grain1.ResistanceNeighbours, Grain2);		
 					local i2 = Grain2.Index
 
-					local C = self:GetC(Grain1.Spin,Grain2.Spin);
+					--local C = self:GetC(Grain1.Spin,Grain2.Spin);
 					local varname = "I"..math.min(i1,i2) .. "_"..math.max(i1,i2);
 					local column = getcolumn(varname);
 					colmax = math.max(column, colmax);
@@ -237,13 +239,13 @@ function Resistance:Setup(Lattice)
 				self.System[row][var2] = sign2;
 
 				local varname = "I"..math.min(i1,i2) .. "_"..math.max(i1,i2);
-				local R = self:GetGrainResistance(i1,i2);
+				local R = self:GetGrainResistance(Grain1.Spin, Grain2.Spin);
 
 				colmax = math.max(var1, colmax);
 				colmax = math.max(var2, colmax);
 
 
-				self.System[row][getcolumn(varname)] = -2;
+				self.System[row][getcolumn(varname)] = -R;
 
 				self.EqList.ResistanceEquation[varname] = row;
 				row = row + 1;
@@ -304,7 +306,7 @@ function Resistance:GetResistance(Grain1, Grain2)
 
 	for Row, Data in pairs(self.System) do 
 		if Data[v2] and Row ~= eq2 then 
-			saved[Row] = {Data[v2]}
+			saved[Row] = Data[v2]
 			Data[v2] = nil;
 		end 
 	end 
@@ -387,7 +389,7 @@ function Resistance:GetResistance(Grain1, Grain2)
 
 	self.System[row1][column1] = nil;
 	self.System[row2][column2] = nil;
-	print(V,I,V2)
+	--print(V,I,V2)
 
 
 	for Row, Data in pairs(saved) do 
@@ -402,6 +404,7 @@ end
 function Resistance:Update(Grain)
 	-- Update the corresponding Ohms law.
 	local i1 = Grain.Index;
+	local sp = Grain.Spin;
 	for _, Grain2 in pairs(Grain.ResistanceNeighbours) do 
 		local i2 = Grain2.Index; 
 		local varname = "I"..math.min(i1,i2) .. "_"..math.max(i1,i2);
@@ -409,11 +412,16 @@ function Resistance:Update(Grain)
 		local row = self.EqList.ResistanceEquation[varname];
 		local column = self.IndexList[varname];
 
-		local R = self:GetGrainResistance(i1,i2);
-
+		local R = self:GetGrainResistance(sp, Grain2.Spin);
+		--print(type(R))
 		self.System[row][column] = -R;
 	end 
 end 
+
+function Resistance:DumpSystem()
+
+	Matrix:DumpMatrix(self.System);
+end
 
 
 

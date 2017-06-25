@@ -8,7 +8,9 @@ Model = Model:New();
 Model.Lattice = MyLattice;
 
 MyLattice:Init(100,100,1);
-MyLattice:InitRandomField(8,0);
+MyLattice:InitRandomField(10,0);
+
+MyLattice.Temperature = 1;
 
 
 -- If you want to calculate resistances, also init the RN;
@@ -16,16 +18,18 @@ MyLattice:InitRandomField(8,0);
 MyLattice:InitRN();
 
 -- Measure from one side to the other.
-local INDEX_1 = MyLattice.Grid[math.floor(MyLattice.x/2)][1][1].Index;
-local INDEX_2 = MyLattice.Grid[math.floor(MyLattice.x/2)][MyLattice.y][1].Index;
+local INDEX_1 = MyLattice.Grid[math.floor(MyLattice.x/2)][1][1];
+local INDEX_2 = MyLattice.Grid[math.floor(MyLattice.x/2)][MyLattice.y][1];
 
 function Model:Measure(Lattice)
 	-- Return a table where [ylabel] = measuredpoint.
 	local Out = {};
 
 	Out.M = Lattice:GetM();
-	--Out.Resistance = Lattice.RN:GetResistance(INDEX_1,INDEX_2);
-	--print(Out.Resistance, Out.M)
+
+	Out.Resistance = Lattice.RN:GetResistance(INDEX_1,INDEX_2);
+--	Lattice.RN:DumpSystem()
+	print(Out.Resistance, Out.M,Lattice.ExternalField)
 	return Out;
 end 
 
@@ -70,12 +74,20 @@ local Field = tjoin(Field,Field4);
 local Field = tjoin(Field,Field5);
 local Field = tjoin(Field,Field6);
 
+--Field = {-1000,1000,-1000};
+
+
 
 local Params = {
 	ExternalField = Field;
 }
 
-Model:Run(Params, 'Cycle');
+Options = {
+	Anim = false;
+	Sweeps = MyLattice.x*MyLattice.y*MyLattice.z*100;
+}
+
+Model:Run(Params, 'Cycle', Options);
 
 
 

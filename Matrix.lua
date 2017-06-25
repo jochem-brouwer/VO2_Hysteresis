@@ -172,7 +172,10 @@ function Matrix:ToUpper(A)
 end 
 
 function Matrix:ToFile(A, fname)
-	local f = io.open(fname, 'w');
+	local f,err = io.open(fname, 'w');
+	if not f then 
+		print(err)
+	end 
 	local rsize = #A;
 	local csize = 0;
 	for Row, Data in pairs(A) do 
@@ -189,7 +192,10 @@ end
 
 function Matrix:ToUpper_Matlab_LastSol(A)
 	self:ToFile(A, 'matlab_workdir/matlab.dat')
-	this = io.open('matlab_workdir/work.txt','w')
+	this,err = io.open('matlab_workdir/work.txt','w')
+	if not this then
+		print(err)
+	end
 	this:close()
 	local f 
 	repeat
@@ -198,10 +204,12 @@ function Matrix:ToUpper_Matlab_LastSol(A)
 	until f 
 
 
+
 	os.remove('matlab_workdir/work.txt');
 	os.remove('matlab_workdir/result.txt');
 
 	result = tonumber(f:read("*all") or 0);
+	f:close()
 	return result
 end
 
@@ -303,13 +311,25 @@ function Matrix:ToUpper_LastSol(A)
 end 
 
 local function showm(M,s)
-	do return end
+	--do return end
 	for row = 1,#M do 
 		for column = 1,s do 
+			--print(row,column, M[row][column])
 			io.write(((M[row][column] or 0)).. " ") 
 		end 
 		io.write("\n")
 	end 
+end
+
+function Matrix:DumpMatrix(A)
+	local colsize=0;
+	for Row, Data in pairs(A) do 
+		--NewMatrix[Row] = {}
+		for Column, Number in pairs(Data) do 
+			colsize=math.max(colsize,Column)
+		end 
+	end 
+	showm(A,colsize)
 end
 
 function Matrix:Solve(A)
@@ -333,7 +353,7 @@ function Matrix:Solve(A)
 		end 
 	end 
 
-	showm(NewMatrix,colsize)
+	--showm(NewMatrix,colsize)
 
 
      local function addrow(row, row2,mul,column0)
@@ -392,7 +412,7 @@ function Matrix:Solve(A)
   				addrow(pivot, check_row, -number/NewMatrix[pivot_i][row], check_row)
   			end
   		end 
- 		showm(NewMatrix,colsize)
+-- 		showm(NewMatrix,colsize)
 
 
      end 
