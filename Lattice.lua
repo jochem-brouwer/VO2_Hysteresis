@@ -260,7 +260,7 @@ function Lattice:GetDeltaU(Grain)
 		if Grain.Bonds then 
 			J = Grain.Bonds[i]
 		end 
-		b_energ = b_energ - 2*spin*Neighbour.Spin * (J);
+		b_energ = b_energ - spin*Neighbour.Spin * (J); -- factor 2 omitted because of definition.
 	end 
 	local EffField = (Grain.LocalField or 0) + self.ExternalField;
 	local FieldEnergy = -EffField*spin;
