@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # [](#header-1)Model Results
 
 # [](#header-2) Clean Ising Model
