@@ -6,4 +6,4 @@ layout: default
 
 ![](out.gif)
 
-[Back](results)
+[Back](../results)
