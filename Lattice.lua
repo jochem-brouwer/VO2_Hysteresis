@@ -1,6 +1,6 @@
 local Lattice = {}
 
-local ResistanceNetwork = require 'Resistance'
+local ResistanceNetwork = require 'Resistance2'
 
 local gd 
 
@@ -79,7 +79,7 @@ function Lattice:ToAnim(latfile_in, gif_out,pxsize,delay, zdepth)
 						else 
 							for dx = tx*pxsize - pxsize + 1, (tx+1)*pxsize+pxsize-2 do 
 								for dy =  ty*pxsize - pxsize + 1,(ty+1)*pxsize+pxsize-2 do 
-									tim:setPixel(dx,dy,mycolor)
+									tim:setPixel(dx-1,dy-1,mycolor)
 								end 
 							end 
 						end
@@ -198,8 +198,8 @@ function Lattice:InitRandomBond(variance, mean)
 end
 
 function Lattice:InitRN() 
-	self.ResUpdate = true; 
-	self.RN:Setup(self);
+--	self.ResUpdate = true; 
+	self.RN.Lattice=self;
 end 
 
 
@@ -319,7 +319,7 @@ end
 function Lattice:FlipSpin(Grain)
 	Grain.Spin = -Grain.Spin;
 	if self.ResUpdate then 
-		self.RN:Update(Grain)
+		--self.RN:Update(Grain)
 	end
 end 
 --[[ 

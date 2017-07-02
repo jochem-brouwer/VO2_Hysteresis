@@ -63,6 +63,7 @@ function Model:Run(PList, SweepMode, Options)
 					end
 				end
 			elseif SweepMode == "Metropolis" then 
+				local Sweeps = Options.Sweeps
 				for Sweep = 1,Sweeps do 
 					-- Pick a random grain; 
 					local Grain = self.Lattice:GetRandomLatticeSite();
@@ -73,6 +74,23 @@ function Model:Run(PList, SweepMode, Options)
 					elseif math.exp(-dU/(self.k*self.Lattice.Temperature)) > math.random() then 
 						self.Lattice:FlipSpin(Grain)
 					end 
+				end
+			elseif SweepMode == "HeatBath" then 
+				local Sweeps = Options.Sweeps
+				local Beta = 1/(self.k*self.Lattice.Temperature);
+				for Sweep = 1,Sweeps do 
+					-- Pick a random grain; 
+					local Grain = self.Lattice:GetRandomLatticeSite();
+					local dU = self.Lattice:GetDeltaU(Grain);
+					local UOld = -dU/2;
+					local UNew = UOld + dU;
+					local exp_new = math.exp(-Beta*UNew)
+					local Z = exp_new + math.exp(-Beta*UOld);
+					flip_chance = exp_new/Z;
+					local num = math.random();
+					if num < flip_chance then 
+						self.Lattice:FlipSpin(Grain);
+					end
 				end
 			end 
 --			self.Lattice:Show() 

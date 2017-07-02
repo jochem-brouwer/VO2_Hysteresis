@@ -6,10 +6,17 @@ function out = matlab_lu(fname);
 
 	test = load(fname);
 	sp = spconvert(test);
-	l = lu(sp);
+	[l,u] = lu(sp);
 
-	sol = l(end-1,end);
-	mul = l(end-1,end-1);
+	
+	sizeof = size(u);
+	colsize = sizeof(2);
+
+%	full(u)
+
+
+	sol = u(colsize-1,end);
+	mul = u(colsize-1,end-1);
 
 	out = full(sol/mul)
 end 

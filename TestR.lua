@@ -7,7 +7,7 @@ local Model = require 'Model';
 Model = Model:New();
 Model.Lattice = MyLattice;
 
-MyLattice:Init(100,100,1);
+MyLattice:Init(20,20,20);
 --MyLattice:InitRandomField(8,0);
 
 -- If you want to calculate resistances, also init the RN;
@@ -71,9 +71,9 @@ local Params = {
 
 --Model:Run(Params, 'Cycle');
 local g1 = MyLattice.Grid[1][1][1];
-local g2 = MyLattice.Grid[60][60][1];
+local g2 = MyLattice.Grid[2][2][2];
 local x = os.clock()
-print(MyLattice.RN:GetResistance(g1,g2))
+print("r", MyLattice.RN:GetResistance(g1,g2))
 print(os.clock()-x)
 
 local Matrix = {{1,2,3,5},{1,-1,9,2}, {5,2,6,3}}
