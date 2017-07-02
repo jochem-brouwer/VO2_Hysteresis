@@ -212,7 +212,7 @@ function Resistance:MatrixSol()
 	for i,v in pairs(self.SolVec) do 
 		self.System[i][column] = v;
 	end 
---[[
+
 	for i,v in pairs(self.System) do 
 		for i = 1, column do 
 			io.write(v[i] or 0)
@@ -220,7 +220,7 @@ function Resistance:MatrixSol()
 		end 
 		io.write("\n")
 	end 
---]]
+
 	local V = 1;
 	local IExt = Matrix:ToUpper_Matlab_LastSol(self.System);
 	--print(IExt)
@@ -240,6 +240,7 @@ end
 -- scans the left and right edges of the lattice.
 function Resistance:GetEdgeResistance()
 	self:Setup();
+	local Lattice = self.Lattice;
 	-- left edge = source
 	local x,y,z = Lattice.x, Lattice.y, Lattice.z; 
 
@@ -256,7 +257,7 @@ function Resistance:GetEdgeResistance()
 
 	for yr = 1, y do 
 		for zr = 1, z do 
-			local Grain = row[yr][zr];
+			local Grain = row2[yr][zr];
 			self:AddSource(Grain,false);
 		end 
 	end 
