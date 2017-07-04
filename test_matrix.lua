@@ -26,6 +26,9 @@ Matrix[5] = {-1,0,0,0,3,-1,0,-1};
 Matrix[6] = {0,-1,0,0,-1,3,-1,0};
 Matrix[7] = {0,0,-1,0,0,-1,3,-1};
 Matrix[8] = {0,0,0,-1,-1,0,-1,3};
+
+
+
 Rkl = m:Det(Matrix,{[1] = true, [7] = true});
 Rl = m:Det(Matrix, {[1] = true});
 print(Rkl,Rl)

@@ -183,6 +183,7 @@ end
 
 function gnuplot.do_plot(g, cmd, path)
     local code = gnuplot.codegen(g, cmd, path)
+    print(code)
     local name = write_temp_file( code )
     local opt = ""
     if persist[g._type] then opt = '--persist' end
@@ -246,6 +247,7 @@ function gnuplot.array(arg)
     local data  = arg[1]
     
     if not data.__gpcache then
+
         for line = 1, #data[1] do
             -- insert regular line
             local aux = {}

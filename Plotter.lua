@@ -5,6 +5,7 @@ local gp = require 'lgnuplot'
 
 local Plotter = {};
 
+
 function Plotter:New()
 	return setmetatable({gp = gp{}, DBins = {}}, {__index=self});-- __newindex = self.Set});
 end 
@@ -58,13 +59,17 @@ function Plotter:Plot(fname)
 		if not data.using then
 			data.using = {1,2}
 		end 
-		if not data.with then data.with = "linespoints" end
-		if not data.title then data.title = "Title" end
+	--	if not data.with then data.with = "linespoints" end
+
+	--	if not data.title then data.title = "Title" end
 		print(data)
 
 		for ind, val in pairs(data) do print(ind, val) if type(val) == "table" then for i,v in pairs(val) do print("\t", i,v) end end end 
-
-		table.insert(d, gp.array(data));
+		if not data.__gptype then 
+			table.insert(d, gp.array(data));
+		else 
+			table.insert(d, gp[data.__gptype](data));
+		end
 	end 
 	self.gp.data = d;
 

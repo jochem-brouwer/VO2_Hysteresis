@@ -175,7 +175,7 @@ function Lattice:InitRandomField(variance, mean)
 end 
 
 -- This can be optimized by immediately setting the neighbour bond too
-function Lattice:InitRandomBond(variance, mean)
+function Lattice:InitRandomBond(variance, mean, noantiferro)
 	for _, Grain in pairs(self.Grains) do 
 		-- Loop over all neighbours..
 		Grain.Bonds = {};
@@ -191,7 +191,13 @@ function Lattice:InitRandomBond(variance, mean)
 			if Neighbour.Bonds and Neighbour.Bonds[My_Index] then 
 				Grain.Bonds[N_Index] = Neighbour.Bonds[My_Index]
 			else 
-				Grain.Bonds[N_Index] = randn(variance,mean)
+				local n = randn(variance,mean);
+				if n < 0 and noantiferro then 
+					repeat 
+						n = randn(variance,mean);
+					until n >= 0
+				end
+				Grain.Bonds[N_Index] = n
 			end 
 		end 
 	end 
@@ -246,7 +252,29 @@ function Lattice:GetNeighbours(x,y,z, NOT_PERIODIC)
 	end  
 	return list
 end 
+ 
+function Lattice:GetThreshField(Grain)
+	local Neighbours = Grain.Neighbours;
+	
+	-- Calculate the current energy and multiply it with 4. See notes.	
+	local spin = Grain.Spin
+	local b_energ = 0;
+	local h_energ = 0;
+	for i, Neighbour in pairs(Neighbours) do 
+		-- Calculate the bond energy.
+		local J = self.J
+		if Grain.Bonds then 
+			J = Grain.Bonds[i]
+		end 
+		b_energ = b_energ - spin*Neighbour.Spin * (J); -- factor 2 omitted because of definition.
+	end 
+	--print(Grain.LocalField)
+	local EffField = (Grain.LocalField or 0) + self.ExternalField;
+	local FieldEnergy = -EffField*spin;
+	local UOld = b_energ + FieldEnergy;
 
+	return b_energ-(Grain.LocalField or 0)*spin;
+end 
 function Lattice:GetDeltaU(Grain)
 	local Neighbours = Grain.Neighbours;
 	
@@ -262,6 +290,7 @@ function Lattice:GetDeltaU(Grain)
 		end 
 		b_energ = b_energ - spin*Neighbour.Spin * (J); -- factor 2 omitted because of definition.
 	end 
+	--print(Grain.LocalField)
 	local EffField = (Grain.LocalField or 0) + self.ExternalField;
 	local FieldEnergy = -EffField*spin;
 	local UOld = b_energ + FieldEnergy;

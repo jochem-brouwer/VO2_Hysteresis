@@ -12,7 +12,7 @@ local Resistance = {};
 
 Resistance.Conductances = {
 	[-1] = 1;-- Semiconducting;
-	[1] = 1;
+	[1] = 100;
 }
 
 -- Both;
@@ -79,8 +79,9 @@ function Resistance:Setup(Lattice)
 		
 
 				for _, Neighbour in pairs(Neighbours) do 
-		
-					local Grain2 = Lattice.Grid[Neighbour[1]][Neighbour[2]][Neighbour[3]]	
+				
+				
+					local Grain2 = (make and Lattice.Grid[Neighbour[1]][Neighbour[2]][Neighbour[3]]) or Neighbour
 					if make then 
 						table.insert(Grain1.ResistanceNeighbours, Grain2);		
 					end 
@@ -213,13 +214,13 @@ function Resistance:MatrixSol()
 		self.System[i][column] = v;
 	end 
 
-	for i,v in pairs(self.System) do 
+	--[[for i,v in pairs(self.System) do 
 		for i = 1, column do 
 			io.write(v[i] or 0)
 			io.write(" ")
 		end 
 		io.write("\n")
-	end 
+	end --]]
 
 	local V = 1;
 	local IExt = Matrix:ToUpper_Matlab_LastSol(self.System);

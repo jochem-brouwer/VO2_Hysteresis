@@ -7,13 +7,13 @@ local Model = require 'Model';
 Model = Model:New();
 Model.Lattice = MyLattice;
 
-MyLattice:Init(20,20,20);
+MyLattice:Init(2,2,1);
 --MyLattice:InitRandomField(8,0);
 
 -- If you want to calculate resistances, also init the RN;
 
 MyLattice:InitRN();
-
+print("Init complete")
 function Model:Measure(Lattice)
 	-- Return a table where [ylabel] = measuredpoint.
 	local Out = {};
@@ -50,7 +50,7 @@ local function tjoin(t1, t2)
 	return out ;
 end 
 
-
+--[[
 local Field = linspace(-3,550,2.5);
 local Field2 = linspace(2.5,400,-1.5);
 local Field3 = linspace(-1.5,450,3);
@@ -64,16 +64,17 @@ local Field = tjoin(Field,Field4);
 local Field = tjoin(Field,Field5);
 local Field = tjoin(Field,Field6);
 
-
+--]]
 local Params = {
 	ExternalField = Field;
 }
 
 --Model:Run(Params, 'Cycle');
 local g1 = MyLattice.Grid[1][1][1];
-local g2 = MyLattice.Grid[2][2][2];
+local g2 = MyLattice.Grid[2][2][1];
 local x = os.clock()
-print("r", MyLattice.RN:GetResistance(g1,g2))
+print('c')
+print("r", MyLattice.RN:GetEdgeResistance(g1,g2))
 print(os.clock()-x)
 
 local Matrix = {{1,2,3,5},{1,-1,9,2}, {5,2,6,3}}

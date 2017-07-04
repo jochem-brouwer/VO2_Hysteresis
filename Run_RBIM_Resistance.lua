@@ -89,5 +89,6 @@ Options = {
 
 Model:Run(Params, 'Cycle', Options);
 
+local Plotter = require 'Plotter'
 
 

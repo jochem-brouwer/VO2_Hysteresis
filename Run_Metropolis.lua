@@ -1,7 +1,11 @@
 local Lattice = require 'Lattice'
 local MyLattice = Lattice:New();
+local seed = os.time();
 
-MyLattice.ExternalField = 0
+--1497362237-33
+math.randomseed(1497362237-33)
+MyLattice.ExternalField = 3.5;
+MyLattice.Temperature = 1;
 
 --math.randomseed(os.time())
 
@@ -9,7 +13,7 @@ local Model = require 'Model';
 Model = Model:New();
 Model.Lattice = MyLattice;
 
-MyLattice:Init(3,3,1);
+MyLattice:Init(5,5,1);
 --MyLattice:InitRandomField(8,0);
 
 -- If you want to calculate resistances, also init the RN;
@@ -48,16 +52,16 @@ local function tjoin(t1, t2)
 end 
 
 
-local t = 1000;
+local t = 520;
 local Time = linspace(0,t+1,t)
 
 Field = linspace(0,21,20)
 
 local Params = {
-	ExternalField = Field;
+	Time = Time;
 }
 
 Model:Run(Params, 'Metropolis', {Sweeps = 3*3*1*10});
 
-
+print(seed)
 

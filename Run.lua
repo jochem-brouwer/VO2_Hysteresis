@@ -12,7 +12,7 @@ MyLattice:InitRandomField(8,0);
 
 -- If you want to calculate resistances, also init the RN;
 
-MyLattice:InitRN();
+--MyLattice:InitRN();
 
 function Model:Measure(Lattice)
 	-- Return a table where [ylabel] = measuredpoint.
