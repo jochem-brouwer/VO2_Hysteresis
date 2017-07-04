@@ -22,3 +22,5 @@
 # [](#header-3) Random Bond Ising Model
 
 [Hysteresis](results/rbond_1/template.md)
+
+[Hysteresis, resistance](results/rbond_1/template.md)
